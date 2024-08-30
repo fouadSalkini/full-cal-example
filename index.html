@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='utf-8' />
+    <script src='./fullcalendar-scheduler-6.1.15/dist/index.global.min.js'></script>
+
+    <style>
+        .modal {
+          display: none; /* Hidden by default */
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+      
+        .modal-content {
+          background-color: #fefefe;
+          margin: 15% auto; /* 15% from the top and centered */
+          padding: 20px;
+          border: 1px solid #888;
+          width: 80%; /* Could be more or less, depending on screen size */
+        }
+      
+        .close-button {
+          color: #aaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+        }
+      
+        .close-button:hover,
+        .close-button:focus {
+          color: black;
+          text-decoration: none;
+          cursor: pointer;
+        }
+      </style>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+
+
+            var calendarEl = document.getElementById('calendar');
+            var modal = document.getElementById('eventModal');
+            var closeButton = document.querySelector('.close-button');
+            var saveButton = document.getElementById('saveEvent');
+            var eventObj;
+
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                //timeZone: 'UTC',
+                initialView: 'resourceTimeGridWeek',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'resourceTimelineMonth,resourceTimeGridWeek,resourceTimeGridDay'
+                },
+
+                resources: [
+                    { id: 'a', title: 'Team A' },
+                    { id: 'b', title: 'Team B' }
+                ],
+                slotLabelFormat: [
+                    { month: 'short' }, // For monthly view
+                    { weekday: 'short', day: 'numeric' }, // For weekly view
+                    { hour: 'numeric', minute: '2-digit' } // For daily view, shows time on the left
+                ],
+                slotLabelInterval: { hour: 1 }, // Show a label for every hour
+                aspectRatio: 1.5,
+                slotMinWidth: 70, // Adjust the width of the columns
+                //events: 'https://fullcalendar.io/api/demo-feeds/events.json?with-resources=2',
+                events: [
+                    {
+                        "resourceId": "a",
+                        "title": "Evt 1",
+                        "start": "2024-08-30",
+                        "end": "2024-08-30"
+                    },
+                    {
+                        "resourceId": "b",
+                        "title": "Evt 2",
+                        "start": "2024-08-30T10:30:00+00:00",
+                        "end": "2024-08-30T12:30:00+00:00"
+                    },
+                    {
+                        "resourceId": "a",
+                        "title": "Evt 3",
+                        "start": "2024-08-30T12:00:00+00:00"
+                    },
+                    {
+                        "resourceId": "b",
+                        "title": "Evt 4",
+                        "start": "2024-08-31T07:00:00+00:00"
+                    },
+                    {
+                        //"url": "http:\/\/google.com\/",
+                        "resourceId": "a",
+                        "title": "Evt 5",
+                        "start": "2024-08-28"
+                    },
+                    {
+                        //"url": "http:\/\/google.com\/",
+                        "resourceId": "a",
+                        "title": "Evt 6",
+                        "start": "2024-08-05"
+                    },
+                    {
+                        //"url": "http:\/\/google.com\/",
+                        "resourceId": "a",
+                        "title": "Evt 7",
+                        "start": "2024-08-10"
+                    },
+                    {
+                        //"url": "http:\/\/google.com\/",
+                        "resourceId": "b",
+                        "title": "Evt 8",
+                        "start": "2024-08-08"
+                    }
+                ],
+                editable: true, // Enable drag-and-drop
+
+                eventClick: function(info) {
+                    eventObj = info.event;
+                  
+                    console.log(eventObj);
+                    // Convert UTC date to local time
+                    function toLocalISOString(date) {
+                      var localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+                      return localDate.toISOString().slice(0, 16); // Format to match <input type="datetime-local">
+                    }
+                  
+                    document.getElementById('eventTitle').value = eventObj.title;
+                    document.getElementById('eventStart').value = toLocalISOString(eventObj.start);
+                    document.getElementById('eventEnd').value = eventObj.end ? toLocalISOString(eventObj.end) : '';
+                  
+                    // Show the modal
+                    modal.style.display = 'block';
+                },
+
+                eventDrop: function (info) {
+                    // Save the new event time to the server here, if needed
+                },
+
+                eventResize: function (info) {
+                    // Save the new event duration to the server here, if needed
+                },
+
+                selectable: true,
+                select: function (info) {
+                    var title = prompt('Enter event title:');
+                    if (title) {
+                        calendar.addEvent({
+                            title: title,
+                            start: info.startStr,
+                            end: info.endStr,
+                            resourceId: info.resource ? info.resource.id : null
+                        });
+                    }
+                    calendar.unselect(); // Clear the selection
+                },
+
+                //allDaySlot: false, // Remove the all-day row
+
+                views: {
+                    resourceTimelineMonth: {
+                        slotLabelInterval: { days: 1 },
+                        slotLabelFormat: { day: 'numeric', weekday: 'short' } // Group by day in the monthly view
+                    },
+                    resourceTimeGridWeek: {
+                        slotLabelFormat: [{ hour: 'numeric', minute: '2-digit' }] // Time format for weekly view
+                    },
+                    resourceTimeGridDay: {
+                        slotLabelFormat: [{ hour: 'numeric', minute: '2-digit' }] // Time format for daily view
+                    }
+                }
+            });
+
+            // Handle the save button click
+            saveButton.onclick = function() {
+                // Convert local time to UTC
+                function toUTC(dateString) {
+                  var localDate = new Date(dateString);
+                  return new Date(localDate.getTime());
+                  return new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000));
+                }
+              
+                // Update event details
+                eventObj.setProp('title', document.getElementById('eventTitle').value);
+                eventObj.setStart(toUTC(document.getElementById('eventStart').value));
+                eventObj.setEnd(document.getElementById('eventEnd').value ? toUTC(document.getElementById('eventEnd').value) : null);
+              
+                // Hide the modal
+                modal.style.display = 'none';
+            };
+
+            // Hide the modal when the close button is clicked
+            closeButton.onclick = function() {
+                modal.style.display = 'none';
+            };
+
+            // Hide the modal when clicking outside of it
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                modal.style.display = 'none';
+                }
+            };
+
+            calendar.render();
+        });
+
+
+    </script>
+</head>
+
+<body>
+    <div id='calendar'></div>
+    <!-- Event Edit Modal -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Edit Event</h2>
+        <form id="eventForm">
+            <div>
+            <label for="eventTitle">Title:</label>
+            <input type="text" id="eventTitle" placeholder="Enter event title">
+            </div>
+            <div>
+            <label for="eventStart">Start:</label>
+            <input type="datetime-local" id="eventStart">
+            </div>
+            <div>
+            <label for="eventEnd">End:</label>
+            <input type="datetime-local" id="eventEnd">
+            </div>
+            <button type="button" id="saveEvent">Save changes</button>
+        </form>
+        </div>
+    </div>
+</body>
+
+</html>
