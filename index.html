@@ -21,6 +21,10 @@
             /* border: solid 1px blue; */
             border-radius: 3px;
         }
+
+        .evt-completed{
+            background-color: #4d734f !important;
+        }
         .fc-event{
             /* background-color: transparent !important;
             border-color: transparent !important; */
@@ -151,16 +155,16 @@
                     },
                     {
                         //"url": "http:\/\/google.com\/",
-                        "resourceId": "a",
+                        "resourceId": "b",
                         "title": "Evt 9",
-                        "start": "2024-09-04T12:00:00+03:00",
+                        "start": "2024-09-02T12:00:00+03:00",
                         "backgroundColor": "red" 
                     },
                     {
                         //"url": "http:\/\/google.com\/",
                         "resourceId": "a",
                         "title": "Evt 10",
-                        "start": "2024-09-03T09:00:00+03:00",
+                        "start": "2024-09-02T09:00:00+03:00",
                         "backgroundColor": "blue" 
                     },
                     {
@@ -169,7 +173,8 @@
                         "title": "Evt 11",
                         "start": "2024-09-06T12:00:00+03:00",
                         "backgroundColor": "black" ,
-                        "borderColor": "red" 
+                        "borderColor": "red",
+                        "classNames": ['evt-completed']
                     }
                 ],
                 // eventContent: function(arg) {
